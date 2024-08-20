@@ -45,15 +45,18 @@
         {
             this.position_x = position_x;
             this.position_y = position_y;
+            this.height = height;
+            this.width = width;
         }
     }
 
     public class Circle : BasicInfo
     {
-        public Circle(int position_x, int position_y, int height, int width)
+        public Circle(int position_x, int position_y, int radius)
         {
             this.position_x = position_x;
             this.position_y = position_y;
+            this.radius = radius;
         }
 
     }

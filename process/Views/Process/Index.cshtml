@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Process";
-    Shapes shapes = ViewBag.shapes;
+    Shapes shapes = ViewBag.Shapes;
+    PageInfo pageInfo = ViewBag.PageInfo;
 }
 @using System.Web
 
@@ -11,11 +12,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <style>
+        .outer-area {
+            width: 1300px;
+            height: 500px;
+            overflow: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+        }
 
+        .inner-area {
+            width: @(pageInfo.p_width)px;
+            height: @(pageInfo.p_height)px;
+            background-color: #f0f0f0;
+        }
+
+        .circle {
+            stroke: blue;
+            stroke-width: 2;
+        }
+
+        .rectangle {
+            stroke: green;
+            stroke-width: 2;
+        }
+
+        .rhombus {
+            stroke: red;
+            stroke-width: 2;
+        }
     </style>
 </head>
 <body>
-    <h2>Status of Product Realization</h2>
+    <h2>Process</h2>
+    <div class="outer-area">
+        <div class="inner-area">
+            <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)">
+                @{
+                    foreach (Circle circle in shapes.circles)
+                    {
+                        @Html.Raw($"<circle cx='{circle.position_x}' cy='{circle.position_y}' r='{circle.radius}' class='circle' fill='white' />")
+                    }
+                    foreach (Rectangle rectangle in shapes.rectangles)
+                    {
+                        @Html.Raw($"<rect x='{rectangle.position_x}' y='{rectangle.position_y}' width='{rectangle.width}' height='{rectangle.height}' class='rectangle' fill='white' />")
+                    }
+                    foreach (Rhombus rhombus in shapes.rhombuses)
+                    {
+                        //@Html.Raw($"<polygon points='{rhombus.position_x + rhombus.height/2},{y1} {x2},{y2} {x3},{y3} {x4},{y4}' class='rhombus' fill='white' />")
+                    }
 
+                }
+            </svg>
+        </div>
+    </div>
 </body>
 </html>
