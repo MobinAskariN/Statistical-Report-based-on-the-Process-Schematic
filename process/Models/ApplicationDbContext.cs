@@ -10,8 +10,8 @@ namespace process.Models
         {
         }
 
-        public DbSet<vwelementposition> vwelementposition { get; set; }
-        public DbSet<vwflowposition> vwflowposition { get; set; }
+        public DbSet<Element> Element { get; set; }
+        public DbSet<Flow> Flow { get; set; }
 
     }
 }

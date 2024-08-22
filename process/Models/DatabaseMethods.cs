@@ -12,14 +12,14 @@ namespace process.Models
             _context = context;
         }
 
-        public List<vwelementposition> getVwelements()
+        public List<Element> getElements()
         {
-            List<vwelementposition> v = _context.vwelementposition.ToList();
+            List<Element> v = _context.Element.ToList();
             return v;
         }
-        public List<vwflowposition> getVwflow()
+        public List<Flow> getFlows()
         {
-            List<vwflowposition> v = _context.vwflowposition.ToList();
+            List<Flow> v = _context.Flow.ToList();
             return v;
         }
 

@@ -1,7 +1,8 @@
 ﻿@{
     ViewData["Title"] = "Process";
-    Shapes shapes = ViewBag.Shapes;
-    PageInfo pageInfo = ViewBag.PageInfo;
+    List<Element> elements = ViewBag.elements;
+    List<Flow> flows = ViewBag.flows;
+    PageInfo pageInfo = ViewBag.pageInfo;
 }
 @using System.Web
 
@@ -22,24 +23,30 @@
         }
 
         .inner-area {
-            width: @(pageInfo.p_width)px;
-            height: @(pageInfo.p_height)px;
+            width: @(pageInfo.p_width + 10)px;
+            height: @(pageInfo.p_height + 30)px;
             background-color: #f0f0f0;
         }
 
-        .circle {
-            stroke: blue;
-            stroke-width: 2;
+        .event {
+            stroke: black;
+            stroke-width: 1;
         }
 
         .rectangle {
-            stroke: green;
-            stroke-width: 2;
+            stroke: black;
+            stroke-width: 1;
         }
 
-        .rhombus {
-            stroke: red;
-            stroke-width: 2;
+        .gateway {
+            stroke: black;
+            stroke-width: 1;
+        }
+
+        .lane {
+            stroke: black;
+            stroke-width: 1;
+            fill: #edfcf8;
         }
     </style>
 </head>
@@ -48,18 +55,52 @@
     <div class="outer-area">
         <div class="inner-area">
             <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)">
+                <!-- Vertical Text -->
+                <text x="20" y="@(pageInfo.p_height / 2)" fill="black" writing-mode="vertical-rl" text-anchor="middle" style="font-size: 20px;">
+                    @pageInfo.p_name
+                </text>
+
                 @{
-                    foreach (Circle circle in shapes.circles)
+
+                    // Render lanes first
+                    foreach (Element element in elements)
                     {
-                        @Html.Raw($"<circle cx='{circle.position_x}' cy='{circle.position_y}' r='{circle.radius}' class='circle' fill='white' />")
+                        if (element.ElementType == "Lane")
+                        {
+                            @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y + 15}'" +
+                                 $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='lane' />")
+
+                            @Html.Raw($"<text x='{element.BOU_X + 30}' y='{element.BOU_Y + 15 + element.BOU_HEIGHT / 2}'" +
+                                 $" fill='black' writing-mode='vertical-rl' text-anchor='middle' style='font-size: 20px;'>")
+                            @Html.Raw($"{element.EName}")
+                            @Html.Raw("</text>")
+                        }
                     }
-                    foreach (Rectangle rectangle in shapes.rectangles)
+
+                    // Render events (circles) after lanes
+                    foreach (Element element in elements)
                     {
-                        @Html.Raw($"<rect x='{rectangle.position_x}' y='{rectangle.position_y}' width='{rectangle.width}' height='{rectangle.height}' class='rectangle' fill='white' />")
-                    }
-                    foreach (Rhombus rhombus in shapes.rhombuses)
-                    {
-                        //@Html.Raw($"<polygon points='{rhombus.position_x + rhombus.height/2},{y1} {x2},{y2} {x3},{y3} {x4},{y4}' class='rhombus' fill='white' />")
+                        if (element.ElementType == "Event")
+                        {
+                            string color;
+                            if (element.EType == "START")
+                                color = "#4ab599";
+                            else
+                                color = "#d15878";
+
+                            @Html.Raw($"<circle cx='{element.BOU_X}' cy='{element.BOU_Y+15}'" +
+                                 $" r='{element.BOU_WIDTH / 2}' class='event' fill='{color}' />")
+                        }
+                        else if (element.ElementType == "Gateway")
+                        {
+                            @Html.Raw($@"
+                                <polygon points='{element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y}
+                                    {element.BOU_X + element.BOU_WIDTH},{element.BOU_Y + element.BOU_HEIGHT / 2}
+                                    {element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y + element.BOU_HEIGHT}
+                                    {element.BOU_X},{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                    stroke='black' stroke-width='3' class='gateway' fill='none'/>")
+
+                        }
                     }
 
                 }
