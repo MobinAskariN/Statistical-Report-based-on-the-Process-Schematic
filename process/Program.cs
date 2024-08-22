@@ -1,7 +1,17 @@
+using process.Models;  // Replace with your actual namespace
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Register the ApplicationDbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register the DatabaseMethods service
+builder.Services.AddScoped<DatabaseMethods>();
 
 var app = builder.Build();
 
