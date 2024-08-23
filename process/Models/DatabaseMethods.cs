@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
 
 namespace process.Models
@@ -22,6 +23,24 @@ namespace process.Models
             List<Flow> v = _context.Flow.ToList();
             return v;
         }
+        public static List<(int x, int y)> ExtractPairs(string jsonString)
+        {
+            var coordinates = JsonConvert.DeserializeObject<List<Coordinate>>(jsonString);
+            List<(int x, int y)> result = new List<(int x, int y)>();
+
+            foreach (var coord in coordinates)
+            {
+                result.Add((coord.x, coord.y));
+            }
+
+            return result;
+        }
 
     }
+    class Coordinate
+    {
+        public int x { get; set; }
+        public int y { get; set; }
+    }
+
 }

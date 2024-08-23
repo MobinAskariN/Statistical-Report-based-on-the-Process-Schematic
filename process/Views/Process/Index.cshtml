@@ -109,6 +109,21 @@
                         }
                     }
 
+                    foreach (Flow flow in flows)
+                    {
+                        List<(int, int)> pairs = DatabaseMethods.ExtractPairs(flow.FLO_STATE);
+                        (int x_p, int y_p) = pairs[0];
+                        for (int i = 1; i < pairs.Count; i++)
+                        {
+                            (int x, int y) = pairs[i];
+                            @Html.Raw($@"<line x1='{x_p}' y1='{y_p}'
+                            x2='{x}' y2='{y}' stroke='black' stroke-width='2'/>")
+                            x_p = x;
+                            y_p = y;
+
+                        }
+                    }
+
                     // Render events (circles) after lanes
                     foreach (Element element in elements)
                     {
