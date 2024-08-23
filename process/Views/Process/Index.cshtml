@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
     <style>
-        .outer-area {
+        #outer-area {
             width: 1300px;
             height: 500px;
             overflow: auto;
@@ -22,10 +22,13 @@
             box-sizing: border-box;
         }
 
-        .inner-area {
+        #inner-area {
             width: @(pageInfo.p_width + 10)px;
             height: @(pageInfo.p_height + 30)px;
             background-color: #f0f0f0;
+        }
+
+        .svg {
         }
 
         .event {
@@ -33,9 +36,10 @@
             stroke-width: 1;
         }
 
-        .rectangle {
+        .task {
             stroke: black;
             stroke-width: 1;
+            fill: #fccf81;
         }
 
         .gateway {
@@ -48,13 +52,41 @@
             stroke-width: 1;
             fill: #edfcf8;
         }
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 70px;
+            right: 10px;
+            background: white;
+            border: 1px solid black;
+            border-radius: 3px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .zoom-controls button {
+            margin: 2px 0;
+            padding: 5px;
+            background: #bacbe6;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .zoom-controls button:hover {
+            background: #97a6bd;
+        }
     </style>
 </head>
 <body>
     <h2>Process</h2>
-    <div class="outer-area">
-        <div class="inner-area">
-            <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)">
+    <div id="outer-area">
+        <div id="inner-area">
+            <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)" id="svg" viewBox="0 0 @(pageInfo.p_width) @(pageInfo.p_height)">
                 <!-- Vertical Text -->
                 <text x="20" y="@(pageInfo.p_height / 2)" fill="black" writing-mode="vertical-rl" text-anchor="middle" style="font-size: 20px;">
                     @pageInfo.p_name
@@ -67,10 +99,10 @@
                     {
                         if (element.ElementType == "Lane")
                         {
-                            @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y + 15}'" +
+                            @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
                                  $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='lane' />")
 
-                            @Html.Raw($"<text x='{element.BOU_X + 30}' y='{element.BOU_Y + 15 + element.BOU_HEIGHT / 2}'" +
+                            @Html.Raw($"<text x='{element.BOU_X + 30}' y='{element.BOU_Y + element.BOU_HEIGHT / 2}'" +
                                  $" fill='black' writing-mode='vertical-rl' text-anchor='middle' style='font-size: 20px;'>")
                             @Html.Raw($"{element.EName}")
                             @Html.Raw("</text>")
@@ -88,7 +120,7 @@
                             else
                                 color = "#d15878";
 
-                            @Html.Raw($"<circle cx='{element.BOU_X}' cy='{element.BOU_Y+15}'" +
+                            @Html.Raw($"<circle cx='{element.BOU_X + element.BOU_WIDTH / 2}' cy='{element.BOU_Y + element.BOU_WIDTH / 2}'" +
                                  $" r='{element.BOU_WIDTH / 2}' class='event' fill='{color}' />")
                         }
                         else if (element.ElementType == "Gateway")
@@ -100,6 +132,38 @@
                                     {element.BOU_X},{element.BOU_Y + element.BOU_HEIGHT / 2}'
                                     stroke='black' stroke-width='3' class='gateway' fill='none'/>")
 
+                            if (element.EType == "EXCLUSIVE")
+                            {
+                                @Html.Raw($@"
+                                    <line x1='{element.BOU_X + element.BOU_WIDTH/4+2}' y1='{element.BOU_Y + element.BOU_HEIGHT/4+2}'
+                                    x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT/4*3-2}'
+                                    stroke='black' stroke-width='3'/>
+
+                                    <line x1='{element.BOU_X + element.BOU_WIDTH / 4 + 2}' y1='{element.BOU_Y + element.BOU_HEIGHT / 4 * 3 - 2}'
+                                    x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT / 4 + 2}'
+                                    stroke='black' stroke-width='3'/>
+                                ")
+                            }
+                            else
+                            {
+                                @Html.Raw($@"
+                                    <line x1='{element.BOU_X + element.BOU_WIDTH / 2}' y1='{element.BOU_Y + 8}'
+                                    x2='{element.BOU_X + element.BOU_WIDTH / 2}' y2='{element.BOU_Y + element.BOU_HEIGHT - 8}'
+                                    stroke='black' stroke-width='3'/>
+
+                                    <line x1='{element.BOU_X + 8}' y1='{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                    x2='{element.BOU_X + element.BOU_WIDTH - 8}' y2='{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                    stroke='black' stroke-width='3'/>
+                                ")
+
+                            }
+
+                        }
+                        else if (element.ElementType == "Task")
+                        {
+                            //@Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
+                            //     $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task' />")
+
                         }
                     }
 
@@ -107,5 +171,71 @@
             </svg>
         </div>
     </div>
+
+
+    <!-- zoom button area -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <div class="zoom-controls">
+        <button onclick="zoomIn()">
+            <i class="fa fa-search-plus" style="font-size:36px"></i>
+        </button>
+        <button onclick="zoomOut()">
+            <i class="fa fa-search-minus" style="font-size:36px"></i>
+        </button>
+    </div>
+
+    <script>
+        const inner_area = document.getElementById('inner-area');
+        const svg = document.getElementById('svg');
+        let scale = 1;
+
+        function zoomIn() {
+            scale += 0.1;
+            updateTransform();
+        }
+
+        function zoomOut() {
+            if (@(pageInfo.p_width) * scale > 1300 || @(pageInfo.p_height) * scale > 500) {
+                scale -= 0.1;
+                updateTransform();
+            }
+        }
+
+        function updateTransform() {
+
+            // Update the size of the SVG to enable more extensive scrolling
+            svg.style.width = `${@(pageInfo.p_width) * scale}px`;
+            svg.style.height = `${@(pageInfo.p_height) * scale}px`;
+
+            inner_area.style.width = `${@(pageInfo.p_width + 10) * scale}px`;
+            inner_area.style.height = `${@(pageInfo.p_height + 30) * scale}px`;
+
+
+            // Update the scroll positions to keep the graph centered
+            //graphContainer.scrollLeft = (svg.clientWidth - graphContainer.clientWidth) ;
+            //graphContainer.scrollTop = (svg.clientHeight - graphContainer.clientHeight);
+        }
+        function showTooltip(evt, content) {
+            const tooltip = document.getElementById('doc-area');
+            tooltip.innerHTML = content;
+            updateTooltip(evt);
+            tooltip.style.visibility = "visible";
+        }
+
+        function updateTooltip(evt) {
+            const tooltip = document.getElementById('doc-area');
+            tooltip.style.left = (evt.pageX + 10) + 'px';
+            tooltip.style.top = (evt.pageY + 10) + 'px';
+
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('doc-area');
+            tooltip.innerHTML = "";
+            tooltip.style.visibility = "hidden";
+        }
+
+    </script>
+
 </body>
 </html>
