@@ -7,6 +7,7 @@ namespace process.Models
     [Keyless]
     public class Element
     {
+        public string ELEMENT_UID { get; set; }
         public string ElementType { get; set; }
         public int BOU_X { get; set; }
         public int BOU_Y { get; set; }
@@ -14,6 +15,7 @@ namespace process.Models
         public int BOU_HEIGHT { get; set; }
         public string? EName { get; set; }
         public string? EType { get; set; }
+        public string BOU_ELEMENT {  get; set; }
     }
 
     [Table("vwflowposition")]

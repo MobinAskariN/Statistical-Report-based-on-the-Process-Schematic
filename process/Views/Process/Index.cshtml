@@ -29,6 +29,7 @@
         }
 
         .svg {
+
         }
 
         .event {
@@ -87,100 +88,152 @@
     <div id="outer-area">
         <div id="inner-area">
             <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)" id="svg" viewBox="0 0 @(pageInfo.p_width) @(pageInfo.p_height)">
+                <defs>
+                    <marker id="arrowhead" markerWidth="5" markerHeight="4" refX="4" refY="2" orient="auto">
+                        <polygon points="0 0, 5 2, 0 4" />
+                    </marker>
+                </defs>
+                
                 <!-- Vertical Text -->
                 <text x="20" y="@(pageInfo.p_height / 2)" fill="black" writing-mode="vertical-rl" text-anchor="middle" style="font-size: 20px;">
                     @pageInfo.p_name
                 </text>
 
                 @{
+                Func<string, int, IEnumerable<string>> WrapText = (text, maxWidth) =>
+                {
+                    var words = text.Split(' ');
+                    var lines = new List<string>();
+                    var currentLine = "";
 
-                    // Render lanes first
-                    foreach (Element element in elements)
+                    foreach (var word in words)
                     {
-                        if (element.ElementType == "Lane")
-                        {
-                            @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
-                                 $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='lane' />")
+                        var testLine = (currentLine.Length == 0) ? word : $"{currentLine} {word}";
+                        var textWidth = testLine.Length * 8; // Assume average character width of 8px for simplicity
 
-                            @Html.Raw($"<text x='{element.BOU_X + 30}' y='{element.BOU_Y + element.BOU_HEIGHT / 2}'" +
-                                 $" fill='black' writing-mode='vertical-rl' text-anchor='middle' style='font-size: 20px;'>")
-                            @Html.Raw($"{element.EName}")
-                            @Html.Raw("</text>")
+                        if (textWidth > maxWidth && currentLine.Length > 0)
+                        {
+                            lines.Add(currentLine);
+                            currentLine = word;
+                        }
+                        else
+                        {
+                            currentLine = testLine;
                         }
                     }
 
-                    foreach (Flow flow in flows)
+                    lines.Add(currentLine);
+                    return lines;
+                };
+
+
+                // Render lanes first
+                foreach (Element element in elements)
+                {
+                    if (element.ElementType == "Lane")
                     {
-                        List<(int, int)> pairs = DatabaseMethods.ExtractPairs(flow.FLO_STATE);
-                        (int x_p, int y_p) = pairs[0];
-                        for (int i = 1; i < pairs.Count; i++)
+                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
+                                $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='lane' />")
+
+                        @Html.Raw($"<text x='{element.BOU_X + 30}' y='{element.BOU_Y + element.BOU_HEIGHT / 2}'" +
+                                $" fill='black' writing-mode='vertical-rl' text-anchor='middle' style='font-size: 20px;'>")
+                        @Html.Raw($"{element.EName}")
+                        @Html.Raw("</text>")
+                    }
+                }
+
+                foreach (Flow flow in flows)
+                {
+                    List<(int, int)> pairs = DatabaseMethods.ExtractPairs(flow.FLO_STATE);
+                    (int x_p, int y_p) = pairs[0];
+                    for (int i = 1; i < pairs.Count; i++)
+                    {
+                        (int x, int y) = pairs[i];
+                        if(i == pairs.Count-1){
+                            @Html.Raw($@"<line x1='{x_p}' y1='{y_p}'
+                            x2='{x}' y2='{y}' stroke='black' stroke-width='2'  marker-end='url(#arrowhead)'/>")
+                        }
+                        else
                         {
-                            (int x, int y) = pairs[i];
                             @Html.Raw($@"<line x1='{x_p}' y1='{y_p}'
                             x2='{x}' y2='{y}' stroke='black' stroke-width='2'/>")
-                            x_p = x;
-                            y_p = y;
-
                         }
+
+                        x_p = x;
+                        y_p = y;
+
                     }
+                }
 
-                    // Render events (circles) after lanes
-                    foreach (Element element in elements)
+                // Render events (circles) after lanes
+                foreach (Element element in elements)
+                {
+                    if (element.ElementType == "Event")
                     {
-                        if (element.ElementType == "Event")
-                        {
-                            string color;
-                            if (element.EType == "START")
-                                color = "#4ab599";
-                            else
-                                color = "#d15878";
+                        string color;
+                        if (element.EType == "START")
+                            color = "#4ab599";
+                        else
+                            color = "#d15878";
 
-                            @Html.Raw($"<circle cx='{element.BOU_X + element.BOU_WIDTH / 2}' cy='{element.BOU_Y + element.BOU_WIDTH / 2}'" +
-                                 $" r='{element.BOU_WIDTH / 2}' class='event' fill='{color}' />")
-                        }
-                        else if (element.ElementType == "Gateway")
+                        @Html.Raw($"<circle cx='{element.BOU_X + element.BOU_WIDTH / 2}' cy='{element.BOU_Y + element.BOU_WIDTH / 2}'" +
+                                $" r='{element.BOU_WIDTH / 2}' class='event' fill='{color}' />")
+                    }
+                    else if (element.ElementType == "Gateway")
+                    {
+                        @Html.Raw($@"
+                            <polygon points='{element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y}
+                                {element.BOU_X + element.BOU_WIDTH},{element.BOU_Y + element.BOU_HEIGHT / 2}
+                                {element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y + element.BOU_HEIGHT}
+                                {element.BOU_X},{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                stroke='black' stroke-width='3' class='gateway' fill='none'/>")
+
+                        if (element.EType == "EXCLUSIVE")
                         {
                             @Html.Raw($@"
-                                <polygon points='{element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y}
-                                    {element.BOU_X + element.BOU_WIDTH},{element.BOU_Y + element.BOU_HEIGHT / 2}
-                                    {element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y + element.BOU_HEIGHT}
-                                    {element.BOU_X},{element.BOU_Y + element.BOU_HEIGHT / 2}'
-                                    stroke='black' stroke-width='3' class='gateway' fill='none'/>")
+                                <line x1='{element.BOU_X + element.BOU_WIDTH/4+2}' y1='{element.BOU_Y + element.BOU_HEIGHT/4+2}'
+                                x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT/4*3-2}'
+                                stroke='black' stroke-width='3'/>
 
-                            if (element.EType == "EXCLUSIVE")
-                            {
-                                @Html.Raw($@"
-                                    <line x1='{element.BOU_X + element.BOU_WIDTH/4+2}' y1='{element.BOU_Y + element.BOU_HEIGHT/4+2}'
-                                    x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT/4*3-2}'
-                                    stroke='black' stroke-width='3'/>
+                                <line x1='{element.BOU_X + element.BOU_WIDTH / 4 + 2}' y1='{element.BOU_Y + element.BOU_HEIGHT / 4 * 3 - 2}'
+                                x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT / 4 + 2}'
+                                stroke='black' stroke-width='3'/>
+                            ")
+                        }
+                        else
+                        {
+                            @Html.Raw($@"
+                                <line x1='{element.BOU_X + element.BOU_WIDTH / 2}' y1='{element.BOU_Y + 8}'
+                                x2='{element.BOU_X + element.BOU_WIDTH / 2}' y2='{element.BOU_Y + element.BOU_HEIGHT - 8}'
+                                stroke='black' stroke-width='3'/>
 
-                                    <line x1='{element.BOU_X + element.BOU_WIDTH / 4 + 2}' y1='{element.BOU_Y + element.BOU_HEIGHT / 4 * 3 - 2}'
-                                    x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT / 4 + 2}'
-                                    stroke='black' stroke-width='3'/>
-                                ")
-                            }
-                            else
-                            {
-                                @Html.Raw($@"
-                                    <line x1='{element.BOU_X + element.BOU_WIDTH / 2}' y1='{element.BOU_Y + 8}'
-                                    x2='{element.BOU_X + element.BOU_WIDTH / 2}' y2='{element.BOU_Y + element.BOU_HEIGHT - 8}'
-                                    stroke='black' stroke-width='3'/>
-
-                                    <line x1='{element.BOU_X + 8}' y1='{element.BOU_Y + element.BOU_HEIGHT / 2}'
-                                    x2='{element.BOU_X + element.BOU_WIDTH - 8}' y2='{element.BOU_Y + element.BOU_HEIGHT / 2}'
-                                    stroke='black' stroke-width='3'/>
-                                ")
-
-                            }
+                                <line x1='{element.BOU_X + 8}' y1='{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                x2='{element.BOU_X + element.BOU_WIDTH - 8}' y2='{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                stroke='black' stroke-width='3'/>
+                            ")
 
                         }
-                        else if (element.ElementType == "Task")
-                        {
-                            //@Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
-                            //     $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task' />")
 
+                    }
+                    else if (element.ElementType == "Task")
+                    {
+
+                        // Calculate the text lines based on the rectangle width
+                        var lines = WrapText(element.EName, element.BOU_WIDTH);
+                        var lineHeight = 16; // Adjust line height if needed
+                        var initialY = element.BOU_Y + element.BOU_HEIGHT / 2 - ((lines.Count() - 1) * lineHeight) / 2;
+                        var currentY = initialY;
+                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
+                                $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task' />")
+
+                        foreach (var line in lines)
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{currentY}' class='' fill='black'
+                                font-size='14' text-anchor='middle' dy='.3em'>{line}</text>")
+                            currentY += lineHeight;
                         }
                     }
+                }
 
                 }
             </svg>
