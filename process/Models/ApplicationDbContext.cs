@@ -12,6 +12,8 @@ namespace process.Models
 
         public DbSet<Element> Element { get; set; }
         public DbSet<Flow> Flow { get; set; }
+        public DbSet<Report> Report { get; set; }
+
 
     }
 }

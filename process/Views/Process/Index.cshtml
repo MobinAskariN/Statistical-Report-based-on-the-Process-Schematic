@@ -23,13 +23,29 @@
         }
 
         #inner-area {
-            width: @(pageInfo.p_width + 10)px;
-            height: @(pageInfo.p_height + 30)px;
-            background-color: #f0f0f0;
+            width: @(pageInfo.p_width + 50)px;
+            height: @(pageInfo.p_height + 50)px;
         }
 
         .svg {
 
+        }
+
+        #report-area {
+            width: 500px;
+            height: 300px;
+            position: absolute;
+            visibility: hidden;
+            display: inline-block;
+            background: white;
+            border: 1px solid black;
+            border-radius: 3px;
+            padding: 5px;
+            direction: rtl;
+            text-align: right;
+            font-size: 15px;
+            left: 500px;
+            top: 200px;
         }
 
         .event {
@@ -53,6 +69,14 @@
             stroke-width: 1;
             fill: #edfcf8;
         }
+
+        .laneset {
+            stroke: black;
+            stroke-width: 1;
+            fill: #f0f0f0;
+
+        }
+
 
         .zoom-controls {
             position: absolute;
@@ -83,21 +107,34 @@
         }
     </style>
 </head>
-<body>
+<body >
     <h2>Process</h2>
     <div id="outer-area">
         <div id="inner-area">
-            <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)" id="svg" viewBox="0 0 @(pageInfo.p_width) @(pageInfo.p_height)">
+            <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)" id="svg" viewBox="0 0 @(pageInfo.p_width+50) @(pageInfo.p_height+50)">
                 <defs>
                     <marker id="arrowhead" markerWidth="5" markerHeight="4" refX="4" refY="2" orient="auto">
                         <polygon points="0 0, 5 2, 0 4" />
                     </marker>
                 </defs>
                 
-                <!-- Vertical Text -->
-                <text x="20" y="@(pageInfo.p_height / 2)" fill="black" writing-mode="vertical-rl" text-anchor="middle" style="font-size: 20px;">
-                    @pageInfo.p_name
-                </text>
+                @{
+                    foreach (Element element in elements)
+                    {
+                        if (element.ElementType == "Laneset")
+                        {
+                            @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
+                                 $"width='{element.BOU_WIDTH+20}' height='{element.BOU_HEIGHT+20}' class='laneset' />")
+
+                            @Html.Raw($"<text x='{element.BOU_X + 22}' y='{element.BOU_Y + element.BOU_HEIGHT / 2}'" +
+                                 $" fill='black' writing-mode='vertical-rl' text-anchor='middle' style='font-size: 20px;'>")
+                            @Html.Raw($"{element.EName}")
+                            @Html.Raw("</text>")
+                            break;
+                        }
+                    }
+
+                }
 
                 @{
                 Func<string, int, IEnumerable<string>> WrapText = (text, maxWidth) =>
@@ -144,12 +181,12 @@
 
                 foreach (Flow flow in flows)
                 {
-                    List<(int, int)> pairs = DatabaseMethods.ExtractPairs(flow.FLO_STATE);
-                    (int x_p, int y_p) = pairs[0];
-                    for (int i = 1; i < pairs.Count; i++)
+                    (int x_p, int y_p) = flow.pairs[0];
+                    for (int i = 1; i < flow.pairs.Count; i++)
                     {
-                        (int x, int y) = pairs[i];
-                        if(i == pairs.Count-1){
+                        (int x, int y) = flow.pairs[i];
+                        if (i == flow.pairs.Count - 1)
+                        {
                             @Html.Raw($@"<line x1='{x_p}' y1='{y_p}'
                             x2='{x}' y2='{y}' stroke='black' stroke-width='2'  marker-end='url(#arrowhead)'/>")
                         }
@@ -186,7 +223,7 @@
                                 {element.BOU_X + element.BOU_WIDTH},{element.BOU_Y + element.BOU_HEIGHT / 2}
                                 {element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y + element.BOU_HEIGHT}
                                 {element.BOU_X},{element.BOU_Y + element.BOU_HEIGHT / 2}'
-                                stroke='black' stroke-width='3' class='gateway' fill='none'/>")
+                                stroke='black' stroke-width='3' class='gateway' fill='white'/>")
 
                         if (element.EType == "EXCLUSIVE")
                         {
@@ -217,6 +254,63 @@
                     }
                     else if (element.ElementType == "Task")
                     {
+                        string tooltipContent = "<svg height='300px' width='500px' >";
+                        tooltipContent += $@"
+                            <text x='490' y='25' class='' fill='black'
+                            font-size='14' text-anchor='left' dy='.3em'> عنوان فعالیت : {element.EName}</text>
+                            
+                            <text x='490' y='55' class='' fill='black'
+                            font-size='14' text-anchor='left' dy='.3em'> تعداد دفعات : {element.report.Gty}</text>
+
+                        ";
+                        double m_W_width = element.report.m_W * 200 / element.report.m_T;
+                        double m_D_width = element.report.m_D * 200 / element.report.m_T;
+                        tooltipContent += $@"
+                            <rect x='20' y='50'
+                            width='{m_W_width}' height='30' class='' fill='red'/>
+
+                            <text x='{20+m_W_width/2}' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_W}</text>
+
+                            <rect x='{20 + m_W_width}' y='50'
+                            width='{m_D_width}' height='30' class='' fill='green'/>
+
+                            <text x='{20+m_W_width+m_D_width/2}' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_D}</text>
+
+                            <text x='120' y='90' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_T}</text>
+
+                            ";
+                        double v_W_width = element.report.v_W * 200 / element.report.v_T;
+                        double v_D_width = element.report.v_D * 200 / element.report.v_T;
+                        tooltipContent += $@"
+                            <rect x='20' y='100'
+                            width='{v_W_width}' height='30' class='' fill='red'/>
+
+                            <text x='{20 + v_W_width / 2}' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_W}</text>
+
+                            <rect x='{20 + v_W_width}' y='100'
+                            width='{v_D_width}' height='30' class='' fill='green'/>
+
+                            <text x='{20 + v_W_width + v_D_width / 2}' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_D}</text>
+
+                            <text x='120' y='140' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_T}</text>
+
+                            ";
+                        tooltipContent += $@"
+                            <foreignObject x='400' y='250' width='80' height='30'>
+                            <body xmlns='http://www.w3.org/1999/xhtml'>
+                            <button onclick='hideTooltip()' style='width: 80px; height: 30px;'>Close</button>
+                            </body>
+                            </foreignObject>
+                            ";
+                        tooltipContent += "</svg>";
+
+                        Console.WriteLine(element.report.m_W);
 
                         // Calculate the text lines based on the rectangle width
                         var lines = WrapText(element.EName, element.BOU_WIDTH);
@@ -224,7 +318,8 @@
                         var initialY = element.BOU_Y + element.BOU_HEIGHT / 2 - ((lines.Count() - 1) * lineHeight) / 2;
                         var currentY = initialY;
                         @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
-                                $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task' />")
+                                $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task'" +
+                                    $"onclick=\"showTooltip(event, '{HttpUtility.JavaScriptStringEncode(tooltipContent)}')\"/>")
 
                         foreach (var line in lines)
                         {
@@ -232,6 +327,15 @@
                                 font-size='14' text-anchor='middle' dy='.3em'>{line}</text>")
                             currentY += lineHeight;
                         }
+
+                        @Html.Raw($@"<text x='{element.BOU_X}' y='{element.BOU_Y-10}' class='' fill='black'
+                                font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_T}</text>")
+                        @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH}' y='{element.BOU_Y - 10}' class='' fill='black'
+                                font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_T}</text>")
+                        @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH/2}' y='{element.BOU_Y + 10}' class='' fill='black'
+                                font-size='14' text-anchor='middle' dy='.3em'>{element.report.Gty}</text>")
+
+                        
                     }
                 }
 
@@ -239,7 +343,8 @@
             </svg>
         </div>
     </div>
-
+    <div id="report-area">
+    </div>
 
     <!-- zoom button area -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -284,21 +389,20 @@
             //graphContainer.scrollTop = (svg.clientHeight - graphContainer.clientHeight);
         }
         function showTooltip(evt, content) {
-            const tooltip = document.getElementById('doc-area');
+            const tooltip = document.getElementById('report-area');
             tooltip.innerHTML = content;
-            updateTooltip(evt);
             tooltip.style.visibility = "visible";
         }
 
         function updateTooltip(evt) {
-            const tooltip = document.getElementById('doc-area');
+            const tooltip = document.getElementById('report-area');
             tooltip.style.left = (evt.pageX + 10) + 'px';
             tooltip.style.top = (evt.pageY + 10) + 'px';
 
         }
 
         function hideTooltip() {
-            const tooltip = document.getElementById('doc-area');
+            const tooltip = document.getElementById('report-area');
             tooltip.innerHTML = "";
             tooltip.style.visibility = "hidden";
         }

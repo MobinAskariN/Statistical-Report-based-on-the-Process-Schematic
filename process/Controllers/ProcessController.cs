@@ -35,26 +35,33 @@ namespace process.Controllers
             foreach (Element e in elements)
                 if(e.ElementType == "Lane")
                     lanes.Add(e);
+            Element laneset = new Element();
+            foreach (Element e in elements)
+                if (e.ElementType == "Laneset")
+                    laneset = e;
+            foreach(Element e in lanes)
+            {
+                e.BOU_X += laneset.BOU_X;
+                e.BOU_Y += laneset.BOU_Y;
+            }
             foreach (Element e in elements)
             {
-                if (e.ElementType == "Lane" || e.ElementType == "Laneset")
+                if (e.ElementType == "Gateway")
                 {
-
-                }
-                else if (e.ElementType == "Gateway")
-                {
-                    e.BOU_X += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_X + 18;
-                    e.BOU_Y += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_Y + 21;
+                    e.BOU_X += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_X+2;
+                    e.BOU_Y += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_Y+2;
                 }
                 else if (e.ElementType == "Event")
                 {
-                    e.BOU_X += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_X + 20;
-                    e.BOU_Y += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_Y + 20;
+                    e.BOU_X += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_X+2;
+                    e.BOU_Y += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_Y+2;
                 }
                 else if (e.ElementType == "Task")
                 {
-                    e.BOU_X += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_X + 20;
-                    e.BOU_Y += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_Y + 20;
+                    e.BOU_X += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_X+2;
+                    e.BOU_Y += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_Y+2;
+                    Report? r = _context.getReport(e.ELEMENT_UID);
+                    e.report = r;
                 }
 
             }

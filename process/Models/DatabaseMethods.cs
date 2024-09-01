@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
+using static System.Collections.Specialized.BitVector32;
 
 namespace process.Models
 {
@@ -21,26 +22,16 @@ namespace process.Models
         public List<Flow> getFlows()
         {
             List<Flow> v = _context.Flow.ToList();
+            foreach (Flow f in v)
+                f.set_pairs();
             return v;
         }
-        public static List<(int x, int y)> ExtractPairs(string jsonString)
+        public Report? getReport(String UID)
         {
-            var coordinates = JsonConvert.DeserializeObject<List<Coordinate>>(jsonString);
-            List<(int x, int y)> result = new List<(int x, int y)>();
-
-            foreach (var coord in coordinates)
-            {
-                result.Add((coord.x, coord.y));
-            }
-
-            return result;
+            Report? report = _context.Report
+                   .FirstOrDefault(s => s.UID == UID);
+            return report;
         }
-
-    }
-    class Coordinate
-    {
-        public int x { get; set; }
-        public int y { get; set; }
     }
 
 }
