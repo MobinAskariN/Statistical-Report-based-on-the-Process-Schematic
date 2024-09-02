@@ -72,21 +72,13 @@ namespace process.Controllers
             ViewBag.pageInfo = pageInfo;
             return View();
         }
+        public JsonResult GetAdditionalInfo(string uid)
+        {
+            // Retrieve the additional information based on the UID
+            List<Person> people = Person.generate_fake_people(); // Replace with actual data fetching logic
+
+            return Json(new { people = people, n_rows = people.Count });
+        }
+
     }
 }
-
-
-/*
-Shapes shapes = new Shapes();
-PageInfo pageInfo = new PageInfo();
-
-pageInfo.p_height = 400;
-pageInfo.p_width = 1700;
-
-shapes.add_rectangle(new Rectangle(10, 10, 50, 50));
-shapes.add_rectangle(new Rectangle(10, 50, 50, 70));
-shapes.add_circle(new Circle(60, 90, 80));
-
-ViewBag.Shapes = shapes;
-ViewBag.PageInfo = pageInfo;
-*/

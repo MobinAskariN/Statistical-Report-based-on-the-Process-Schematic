@@ -55,9 +55,42 @@ namespace process.Models
         public int v_W { get; set; }
         public int Gty {  get; set; }
     }
-    public class people
+    public class Person
     {
-
+        public string name { get; set; }
+        public string UID { get; set; }
+        public int m_T { get; set; }
+        public int v_T { get; set; }
+        public int m_D { get; set; }
+        public int v_D { get; set; }
+        public int m_W { get; set; }
+        public int v_W { get; set; }
+        public int Gty { get; set; }
+        public Person(string name, string UID, int m_T, int v_T, int m_D, int v_D, int m_W, int v_W, int Gty)
+        {
+            this.name = name;
+            this.UID = UID;
+            this.m_T = m_T;
+            this.v_T = v_T;
+            this.m_D = m_D;
+            this.v_D = v_D;
+            this.m_W = m_W;
+            this.v_W = v_W;
+            this.Gty = Gty;
+        }
+        public static List<Person> generate_fake_people()
+        {
+            List<Person> list = new List<Person>();
+            Person p1 = new Person("ali", "1e21", 1, 1, 1, 1, 1, 1, 1);
+            Person p2 = new Person("mamad", "1e21", 1, 1, 1, 1, 1, 1, 1);
+            Person p3 = new Person("hesam", "1e21", 1, 1, 1, 1, 1, 1, 1);
+            Person p4 = new Person("hasan", "1e21", 1, 1, 1, 1, 1, 1, 1);
+            list.Add(p1);
+            list.Add(p2);
+            list.Add(p3);
+            list.Add(p4);
+            return list;
+        }
     }
     class Coordinate// this is not a table
     {

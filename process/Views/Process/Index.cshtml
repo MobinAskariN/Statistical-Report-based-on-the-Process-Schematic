@@ -32,7 +32,7 @@
         }
 
         #report-area {
-            width: 500px;
+            width: 550px;
             height: 300px;
             position: absolute;
             visibility: hidden;
@@ -46,6 +46,7 @@
             font-size: 15px;
             left: 500px;
             top: 200px;
+            overflow: auto;
         }
 
         .event {
@@ -54,10 +55,22 @@
         }
 
         .task {
-            stroke: black;
-            stroke-width: 1;
-            fill: #fccf81;
+            stroke: #333;
+            stroke-width: 2; 
+            fill: #fccf81; 
+            transition: fill 0.3s ease, stroke 0.3s ease;
+            cursor: pointer; 
         }
+
+            .task:hover {
+                fill: #f8b26a;
+                stroke: #555; 
+            }
+
+            .task:active {
+                fill: #e67e22; 
+                stroke: #444; 
+            }
 
         .gateway {
             stroke: black;
@@ -105,6 +118,35 @@
         .zoom-controls button:hover {
             background: #97a6bd;
         }
+
+        .table-style {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .table-style th, .table-style td {
+            padding: 8px;
+            text-align: center; /* Center horizontally */
+            vertical-align: middle; /* Center vertically */
+        }
+
+        .table-style thead {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .table-style tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table-style tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
     </style>
 </head>
 <body >
@@ -249,12 +291,13 @@
                                 stroke='black' stroke-width='3'/>
                             ")
 
-                        }
+                            }
 
-                    }
+                        }
                     else if (element.ElementType == "Task")
                     {
-                        string tooltipContent = "<svg height='300px' width='500px' >";
+                        string tooltipContent = "";
+                        //tooltipContent = "<svg height='300px' width='500px' viewBox='0 0 500 300'>";
                         tooltipContent += $@"
                             <text x='490' y='25' class='' fill='black'
                             font-size='14' text-anchor='left' dy='.3em'> عنوان فعالیت : {element.EName}</text>
@@ -266,49 +309,59 @@
                         double m_W_width = element.report.m_W * 200 / element.report.m_T;
                         double m_D_width = element.report.m_D * 200 / element.report.m_T;
                         tooltipContent += $@"
-                            <rect x='20' y='50'
-                            width='{m_W_width}' height='30' class='' fill='red'/>
+                            <text x='20' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>m_W</text>
+                            <text x='260' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>m_D</text>
+                        
+                            <rect x='40' y='50'
+                            width='{m_W_width}' height='30' class='' fill='#ebc402'/>
 
-                            <text x='{20+m_W_width/2}' y='65' class='' fill='black'
+                            <text x='{40+m_W_width/2}' y='65' class='' fill='black'
                             font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_W}</text>
 
-                            <rect x='{20 + m_W_width}' y='50'
-                            width='{m_D_width}' height='30' class='' fill='green'/>
+                            <rect x='{40 + m_W_width}' y='50'
+                            width='{m_D_width}' height='30' class='' fill='#7fcf5f'/>
 
-                            <text x='{20+m_W_width+m_D_width/2}' y='65' class='' fill='black'
+                            <text x='{40+m_W_width+m_D_width/2}' y='65' class='' fill='black'
                             font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_D}</text>
 
-                            <text x='120' y='90' class='' fill='black'
-                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_T}</text>
+                            <text x='140' y='90' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>m_T : {element.report.m_T}</text>
 
                             ";
                         double v_W_width = element.report.v_W * 200 / element.report.v_T;
                         double v_D_width = element.report.v_D * 200 / element.report.v_T;
                         tooltipContent += $@"
-                            <rect x='20' y='100'
-                            width='{v_W_width}' height='30' class='' fill='red'/>
+                            <text x='20' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>v_W</text>
+                            <text x='260' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>v_D</text>
 
-                            <text x='{20 + v_W_width / 2}' y='115' class='' fill='black'
+                            <rect x='40' y='100'
+                            width='{v_W_width}' height='30' class='' fill='#ebc402'/>
+
+                            <text x='{40 + v_W_width / 2}' y='115' class='' fill='black'
                             font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_W}</text>
 
-                            <rect x='{20 + v_W_width}' y='100'
-                            width='{v_D_width}' height='30' class='' fill='green'/>
+                            <rect x='{40 + v_W_width}' y='100'
+                            width='{v_D_width}' height='30' class='' fill='#7fcf5f'/>
 
-                            <text x='{20 + v_W_width + v_D_width / 2}' y='115' class='' fill='black'
+                            <text x='{40 + v_W_width + v_D_width / 2}' y='115' class='' fill='black'
                             font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_D}</text>
 
-                            <text x='120' y='140' class='' fill='black'
-                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_T}</text>
+                            <text x='140' y='140' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>v_T : {element.report.v_T}</text>
 
                             ";
                         tooltipContent += $@"
-                            <foreignObject x='400' y='250' width='80' height='30'>
+                            <foreignObject x='400' y='100' width='80' height='30'>
                             <body xmlns='http://www.w3.org/1999/xhtml'>
                             <button onclick='hideTooltip()' style='width: 80px; height: 30px;'>Close</button>
                             </body>
                             </foreignObject>
                             ";
-                        tooltipContent += "</svg>";
+                        //tooltipContent += "</svg>";
 
                         Console.WriteLine(element.report.m_W);
 
@@ -319,12 +372,11 @@
                         var currentY = initialY;
                         @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
                                 $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task'" +
-                                    $"onclick=\"showTooltip(event, '{HttpUtility.JavaScriptStringEncode(tooltipContent)}')\"/>")
-
+                                 $"onclick=\"loadAdditionalData('{element.ELEMENT_UID}', event, '{HttpUtility.JavaScriptStringEncode(tooltipContent)}')\" />")
                         foreach (var line in lines)
                         {
                             @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{currentY}' class='' fill='black'
-                                font-size='14' text-anchor='middle' dy='.3em'>{line}</text>")
+                            font-size='14' text-anchor='middle' pointer-events='none' dy='.3em'>{line}</text>")
                             currentY += lineHeight;
                         }
 
@@ -375,18 +427,12 @@
         }
 
         function updateTransform() {
-
             // Update the size of the SVG to enable more extensive scrolling
             svg.style.width = `${@(pageInfo.p_width) * scale}px`;
             svg.style.height = `${@(pageInfo.p_height) * scale}px`;
 
             inner_area.style.width = `${@(pageInfo.p_width + 10) * scale}px`;
             inner_area.style.height = `${@(pageInfo.p_height + 30) * scale}px`;
-
-
-            // Update the scroll positions to keep the graph centered
-            //graphContainer.scrollLeft = (svg.clientWidth - graphContainer.clientWidth) ;
-            //graphContainer.scrollTop = (svg.clientHeight - graphContainer.clientHeight);
         }
         function showTooltip(evt, content) {
             const tooltip = document.getElementById('report-area');
@@ -394,17 +440,71 @@
             tooltip.style.visibility = "visible";
         }
 
-        function updateTooltip(evt) {
-            const tooltip = document.getElementById('report-area');
-            tooltip.style.left = (evt.pageX + 10) + 'px';
-            tooltip.style.top = (evt.pageY + 10) + 'px';
-
-        }
-
         function hideTooltip() {
             const tooltip = document.getElementById('report-area');
             tooltip.innerHTML = "";
             tooltip.style.visibility = "hidden";
+        }
+
+        function loadAdditionalData(uid, evt, initialTooltipContent) {
+            $.ajax({
+                url: '/Process/GetAdditionalInfo',
+                type: 'GET',
+                data: { uid: uid }, // Pass the UID as a query parameter
+                success: function (response) {
+                    // Start building the table
+                    let tableContent = `
+            <foreignObject x='20' y='160' width='460' height='200'>
+                <body xmlns='http://www.w3.org/1999/xhtml'>
+                    <table class='table-style'>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>m_T</th>
+                                <th>v_T</th>
+                                <th>m_D</th>
+                                <th>v_D</th>
+                                <th>m_W</th>
+                                <th>v_W</th>
+                                <th>Gty</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.people.forEach((person, index) => {
+                        tableContent += `
+                <tr>
+                    <td>${person.name}</td>
+                    <td>${person.m_T}</td>
+                    <td>${person.v_T}</td>
+                    <td>${person.m_D}</td>
+                    <td>${person.v_D}</td>
+                    <td>${person.m_W}</td>
+                    <td>${person.v_W}</td>
+                    <td>${person.Gty}</td>
+                </tr>`;
+                    });
+
+                    tableContent += `
+                        </tbody>
+                    </table>
+                </body>
+            </foreignObject>`;
+
+                    // Combine the initial tooltip content with the table
+                    initialTooltipContent = `<svg height='${200 + response.n_rows * 40}px' width='500px' viewBox='0 0 500 ${200 + response.n_rows * 40}'>` + initialTooltipContent;
+                    let updatedTooltipContent = initialTooltipContent + tableContent;
+
+                    // Close the SVG tag
+                    updatedTooltipContent += "</svg>";
+
+                    // Show the updated tooltip content
+                    showTooltip(evt, updatedTooltipContent);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching additional data:', status, error);
+                }
+            });
         }
 
     </script>
