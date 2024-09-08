@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using process.Models;
+using System.Drawing;
 using static Azure.Core.HttpHeader;
 
 namespace process.Controllers
@@ -60,10 +61,41 @@ namespace process.Controllers
                 {
                     e.BOU_X += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_X+2;
                     e.BOU_Y += lanes.FirstOrDefault(lane => lane.ELEMENT_UID == e.BOU_ELEMENT).BOU_Y+2;
-                    Report? r = _context.getReport(e.ELEMENT_UID);
-                    e.report = r;
                 }
 
+            }
+
+            // setting Task reports and their color
+            int min_m_t = -1, max_m_t = -1;
+            foreach(Element e in elements)
+            {
+                if(e.ElementType == "Task")
+                {
+                    Report? r = _context.getReport(e.ELEMENT_UID);
+                    e.report = r;
+
+                    if(min_m_t == -1)
+                    {
+                        min_m_t = r.m_T;
+                        max_m_t = r.m_T;
+                    }
+                    else
+                    {
+                        min_m_t = Math.Min(min_m_t, r.m_T);
+                        max_m_t = Math.Max(max_m_t, r.m_T);
+                    }
+                }
+            }
+            foreach(Element e in elements)
+            {
+                if (e.ElementType == "Task")
+                {
+                    double normalized = (e.report.m_T - min_m_t) / (max_m_t - min_m_t);
+                    int r = (int)(255 * normalized);
+                    int g = 0; 
+                    int b = (int)(255 * (1 - normalized));
+                    e.rgb = (r, g, b);
+                }
             }
 
 

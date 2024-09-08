@@ -55,8 +55,7 @@
         }
 
         .task {
-            stroke: #333;
-            stroke-width: 2; 
+            stroke-width: 4; 
             fill: #fccf81; 
             transition: fill 0.3s ease, stroke 0.3s ease;
             cursor: pointer; 
@@ -370,7 +369,7 @@
                         var lineHeight = 16; // Adjust line height if needed
                         var initialY = element.BOU_Y + element.BOU_HEIGHT / 2 - ((lines.Count() - 1) * lineHeight) / 2;
                         var currentY = initialY;
-                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
+                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}' stroke='rgb({element.rgb.Item1},{element.rgb.Item2},{element.rgb.Item3})'" +
                                 $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task'" +
                                  $"onclick=\"loadAdditionalData('{element.ELEMENT_UID}', event, '{HttpUtility.JavaScriptStringEncode(tooltipContent)}')\" />")
                         foreach (var line in lines)

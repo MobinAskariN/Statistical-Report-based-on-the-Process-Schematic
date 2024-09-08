@@ -20,6 +20,8 @@ namespace process.Models
         public string BOU_ELEMENT {  get; set; }
         [NotMapped]
         public Report? report { get; set; }
+        [NotMapped]
+        public (int, int, int) rgb { get; set; }
     }
 
     [Table("vwflowposition")]
