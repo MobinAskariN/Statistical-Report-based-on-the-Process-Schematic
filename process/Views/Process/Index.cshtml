@@ -1,0 +1,512 @@
+﻿@{
+    ViewData["Title"] = "Process";
+    List<Element> elements = ViewBag.elements;
+    List<Flow> flows = ViewBag.flows;
+    PageInfo pageInfo = ViewBag.pageInfo;
+}
+@using System.Web
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        #outer-area {
+            width: 1300px;
+            height: 500px;
+            overflow: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #inner-area {
+            width: @(pageInfo.p_width + 50)px;
+            height: @(pageInfo.p_height + 50)px;
+        }
+
+        .svg {
+
+        }
+
+        #report-area {
+            width: 550px;
+            height: 300px;
+            position: absolute;
+            visibility: hidden;
+            display: inline-block;
+            background: white;
+            border: 1px solid black;
+            border-radius: 3px;
+            padding: 5px;
+            direction: rtl;
+            text-align: right;
+            font-size: 15px;
+            left: 500px;
+            top: 200px;
+            overflow: auto;
+        }
+
+        .event {
+            stroke: black;
+            stroke-width: 1;
+        }
+
+        .task {
+            stroke-width: 4; 
+            fill: #fccf81; 
+            transition: fill 0.3s ease, stroke 0.3s ease;
+            cursor: pointer; 
+        }
+
+            .task:hover {
+                fill: #f8b26a;
+                stroke: #555; 
+            }
+
+            .task:active {
+                fill: #e67e22; 
+                stroke: #444; 
+            }
+
+        .gateway {
+            stroke: black;
+            stroke-width: 1;
+        }
+
+        .lane {
+            stroke: black;
+            stroke-width: 1;
+            fill: #edfcf8;
+        }
+
+        .laneset {
+            stroke: black;
+            stroke-width: 1;
+            fill: #f0f0f0;
+
+        }
+
+
+        .zoom-controls {
+            position: absolute;
+            bottom: 70px;
+            right: 10px;
+            background: white;
+            border: 1px solid black;
+            border-radius: 3px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .zoom-controls button {
+            margin: 2px 0;
+            padding: 5px;
+            background: #bacbe6;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .zoom-controls button:hover {
+            background: #97a6bd;
+        }
+
+        .table-style {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .table-style th, .table-style td {
+            padding: 8px;
+            text-align: center; /* Center horizontally */
+            vertical-align: middle; /* Center vertically */
+        }
+
+        .table-style thead {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .table-style tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .table-style tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+    </style>
+</head>
+<body >
+    <h2>Process</h2>
+    <div id="outer-area">
+        <div id="inner-area">
+            <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)" id="svg" viewBox="0 0 @(pageInfo.p_width+50) @(pageInfo.p_height+50)">
+                <defs>
+                    <marker id="arrowhead" markerWidth="5" markerHeight="4" refX="4" refY="2" orient="auto">
+                        <polygon points="0 0, 5 2, 0 4" />
+                    </marker>
+                </defs>
+                
+                @{
+                    foreach (Element element in elements)
+                    {
+                        if (element.ElementType == "Laneset")
+                        {
+                            @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
+                                 $"width='{element.BOU_WIDTH+20}' height='{element.BOU_HEIGHT+20}' class='laneset' />")
+
+                            @Html.Raw($"<text x='{element.BOU_X + 22}' y='{element.BOU_Y + element.BOU_HEIGHT / 2}'" +
+                                 $" fill='black' writing-mode='vertical-rl' text-anchor='middle' style='font-size: 20px;'>")
+                            @Html.Raw($"{element.EName}")
+                            @Html.Raw("</text>")
+                            break;
+                        }
+                    }
+
+                }
+
+                @{
+                Func<string, int, IEnumerable<string>> WrapText = (text, maxWidth) =>
+                {
+                    var words = text.Split(' ');
+                    var lines = new List<string>();
+                    var currentLine = "";
+
+                    foreach (var word in words)
+                    {
+                        var testLine = (currentLine.Length == 0) ? word : $"{currentLine} {word}";
+                        var textWidth = testLine.Length * 8; // Assume average character width of 8px for simplicity
+
+                        if (textWidth > maxWidth && currentLine.Length > 0)
+                        {
+                            lines.Add(currentLine);
+                            currentLine = word;
+                        }
+                        else
+                        {
+                            currentLine = testLine;
+                        }
+                    }
+
+                    lines.Add(currentLine);
+                    return lines;
+                };
+
+
+                // Render lanes first
+                foreach (Element element in elements)
+                {
+                    if (element.ElementType == "Lane")
+                    {
+                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}'" +
+                                $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='lane' />")
+
+                        @Html.Raw($"<text x='{element.BOU_X + 30}' y='{element.BOU_Y + element.BOU_HEIGHT / 2}'" +
+                                $" fill='black' writing-mode='vertical-rl' text-anchor='middle' style='font-size: 20px;'>")
+                        @Html.Raw($"{element.EName}")
+                        @Html.Raw("</text>")
+                    }
+                }
+
+                foreach (Flow flow in flows)
+                {
+                    (int x_p, int y_p) = flow.pairs[0];
+                    for (int i = 1; i < flow.pairs.Count; i++)
+                    {
+                        (int x, int y) = flow.pairs[i];
+                        if (i == flow.pairs.Count - 1)
+                        {
+                            @Html.Raw($@"<line x1='{x_p}' y1='{y_p}'
+                            x2='{x}' y2='{y}' stroke='black' stroke-width='2'  marker-end='url(#arrowhead)'/>")
+                        }
+                        else
+                        {
+                            @Html.Raw($@"<line x1='{x_p}' y1='{y_p}'
+                            x2='{x}' y2='{y}' stroke='black' stroke-width='2'/>")
+                        }
+
+                        x_p = x;
+                        y_p = y;
+
+                    }
+                }
+
+                // Render events (circles) after lanes
+                foreach (Element element in elements)
+                {
+                    if (element.ElementType == "Event")
+                    {
+                        string color;
+                        if (element.EType == "START")
+                            color = "#4ab599";
+                        else
+                            color = "#d15878";
+
+                        @Html.Raw($"<circle cx='{element.BOU_X + element.BOU_WIDTH / 2}' cy='{element.BOU_Y + element.BOU_WIDTH / 2}'" +
+                                $" r='{element.BOU_WIDTH / 2}' class='event' fill='{color}' />")
+                    }
+                    else if (element.ElementType == "Gateway")
+                    {
+                        @Html.Raw($@"
+                            <polygon points='{element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y}
+                                {element.BOU_X + element.BOU_WIDTH},{element.BOU_Y + element.BOU_HEIGHT / 2}
+                                {element.BOU_X + element.BOU_WIDTH / 2},{element.BOU_Y + element.BOU_HEIGHT}
+                                {element.BOU_X},{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                stroke='black' stroke-width='3' class='gateway' fill='white'/>")
+
+                        if (element.EType == "EXCLUSIVE")
+                        {
+                            @Html.Raw($@"
+                                <line x1='{element.BOU_X + element.BOU_WIDTH/4+2}' y1='{element.BOU_Y + element.BOU_HEIGHT/4+2}'
+                                x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT/4*3-2}'
+                                stroke='black' stroke-width='3'/>
+
+                                <line x1='{element.BOU_X + element.BOU_WIDTH / 4 + 2}' y1='{element.BOU_Y + element.BOU_HEIGHT / 4 * 3 - 2}'
+                                x2='{element.BOU_X + element.BOU_WIDTH / 4 * 3 - 2}' y2='{element.BOU_Y + element.BOU_HEIGHT / 4 + 2}'
+                                stroke='black' stroke-width='3'/>
+                            ")
+                        }
+                        else
+                        {
+                            @Html.Raw($@"
+                                <line x1='{element.BOU_X + element.BOU_WIDTH / 2}' y1='{element.BOU_Y + 8}'
+                                x2='{element.BOU_X + element.BOU_WIDTH / 2}' y2='{element.BOU_Y + element.BOU_HEIGHT - 8}'
+                                stroke='black' stroke-width='3'/>
+
+                                <line x1='{element.BOU_X + 8}' y1='{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                x2='{element.BOU_X + element.BOU_WIDTH - 8}' y2='{element.BOU_Y + element.BOU_HEIGHT / 2}'
+                                stroke='black' stroke-width='3'/>
+                            ")
+
+                            }
+
+                        }
+                    else if (element.ElementType == "Task")
+                    {
+                        string tooltipContent = "";
+                        //tooltipContent = "<svg height='300px' width='500px' viewBox='0 0 500 300'>";
+                        tooltipContent += $@"
+                            <text x='490' y='25' class='' fill='black'
+                            font-size='14' text-anchor='left' dy='.3em'> عنوان فعالیت : {element.EName}</text>
+                            
+                            <text x='490' y='55' class='' fill='black'
+                            font-size='14' text-anchor='left' dy='.3em'> تعداد دفعات : {element.report.Gty}</text>
+
+                        ";
+                        double m_W_width = element.report.m_W * 200 / element.report.m_T;
+                        double m_D_width = element.report.m_D * 200 / element.report.m_T;
+                        tooltipContent += $@"
+                            <text x='20' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>m_W</text>
+                            <text x='260' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>m_D</text>
+                        
+                            <rect x='40' y='50'
+                            width='{m_W_width}' height='30' class='' fill='#ebc402'/>
+
+                            <text x='{40+m_W_width/2}' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_W}</text>
+
+                            <rect x='{40 + m_W_width}' y='50'
+                            width='{m_D_width}' height='30' class='' fill='#7fcf5f'/>
+
+                            <text x='{40+m_W_width+m_D_width/2}' y='65' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_D}</text>
+
+                            <text x='140' y='90' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>m_T : {element.report.m_T}</text>
+
+                            ";
+                        double v_W_width = element.report.v_W * 200 / element.report.v_T;
+                        double v_D_width = element.report.v_D * 200 / element.report.v_T;
+                        tooltipContent += $@"
+                            <text x='20' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>v_W</text>
+                            <text x='260' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>v_D</text>
+
+                            <rect x='40' y='100'
+                            width='{v_W_width}' height='30' class='' fill='#ebc402'/>
+
+                            <text x='{40 + v_W_width / 2}' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_W}</text>
+
+                            <rect x='{40 + v_W_width}' y='100'
+                            width='{v_D_width}' height='30' class='' fill='#7fcf5f'/>
+
+                            <text x='{40 + v_W_width + v_D_width / 2}' y='115' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_D}</text>
+
+                            <text x='140' y='140' class='' fill='black'
+                            font-size='14' text-anchor='middle' dy='.3em'>v_T : {element.report.v_T}</text>
+
+                            ";
+                        tooltipContent += $@"
+                            <foreignObject x='400' y='100' width='80' height='30'>
+                            <body xmlns='http://www.w3.org/1999/xhtml'>
+                            <button onclick='hideTooltip()' style='width: 80px; height: 30px;'>Close</button>
+                            </body>
+                            </foreignObject>
+                            ";
+                        //tooltipContent += "</svg>";
+
+                        Console.WriteLine(element.report.m_W);
+
+                        // Calculate the text lines based on the rectangle width
+                        var lines = WrapText(element.EName, element.BOU_WIDTH);
+                        var lineHeight = 16; // Adjust line height if needed
+                        var initialY = element.BOU_Y + element.BOU_HEIGHT / 2 - ((lines.Count() - 1) * lineHeight) / 2;
+                        var currentY = initialY;
+                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}' stroke='rgb({element.rgb.Item1},{element.rgb.Item2},{element.rgb.Item3})'" +
+                                $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task'" +
+                                 $"onclick=\"loadAdditionalData('{element.ELEMENT_UID}', event, '{HttpUtility.JavaScriptStringEncode(tooltipContent)}')\" />")
+                        foreach (var line in lines)
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{currentY}' class='' fill='black'
+                            font-size='14' text-anchor='middle' pointer-events='none' dy='.3em'>{line}</text>")
+                            currentY += lineHeight;
+                        }
+
+                        @Html.Raw($@"<text x='{element.BOU_X}' y='{element.BOU_Y-10}' class='' fill='black'
+                                font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_T}</text>")
+                        @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH}' y='{element.BOU_Y - 10}' class='' fill='black'
+                                font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_T}</text>")
+                        @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH/2}' y='{element.BOU_Y + 10}' class='' fill='black'
+                                font-size='14' text-anchor='middle' dy='.3em'>{element.report.Gty}</text>")
+
+                        
+                    }
+                }
+
+                }
+            </svg>
+        </div>
+    </div>
+    <div id="report-area">
+    </div>
+
+    <!-- zoom button area -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <div class="zoom-controls">
+        <button onclick="zoomIn()">
+            <i class="fa fa-search-plus" style="font-size:36px"></i>
+        </button>
+        <button onclick="zoomOut()">
+            <i class="fa fa-search-minus" style="font-size:36px"></i>
+        </button>
+    </div>
+
+    <script>
+        const inner_area = document.getElementById('inner-area');
+        const svg = document.getElementById('svg');
+        let scale = 1;
+
+        function zoomIn() {
+            scale += 0.1;
+            updateTransform();
+        }
+
+        function zoomOut() {
+            if (@(pageInfo.p_width) * scale > 1300 || @(pageInfo.p_height) * scale > 500) {
+                scale -= 0.1;
+                updateTransform();
+            }
+        }
+
+        function updateTransform() {
+            // Update the size of the SVG to enable more extensive scrolling
+            svg.style.width = `${@(pageInfo.p_width) * scale}px`;
+            svg.style.height = `${@(pageInfo.p_height) * scale}px`;
+
+            inner_area.style.width = `${@(pageInfo.p_width + 10) * scale}px`;
+            inner_area.style.height = `${@(pageInfo.p_height + 30) * scale}px`;
+        }
+        function showTooltip(evt, content) {
+            const tooltip = document.getElementById('report-area');
+            tooltip.innerHTML = content;
+            tooltip.style.visibility = "visible";
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('report-area');
+            tooltip.innerHTML = "";
+            tooltip.style.visibility = "hidden";
+        }
+
+        function loadAdditionalData(uid, evt, initialTooltipContent) {
+            $.ajax({
+                url: '/Process/GetAdditionalInfo',
+                type: 'GET',
+                data: { uid: uid }, // Pass the UID as a query parameter
+                success: function (response) {
+                    // Start building the table
+                    let tableContent = `
+            <foreignObject x='20' y='160' width='460' height='200'>
+                <body xmlns='http://www.w3.org/1999/xhtml'>
+                    <table class='table-style'>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>m_T</th>
+                                <th>v_T</th>
+                                <th>m_D</th>
+                                <th>v_D</th>
+                                <th>m_W</th>
+                                <th>v_W</th>
+                                <th>Gty</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+
+                    response.people.forEach((person, index) => {
+                        tableContent += `
+                <tr>
+                    <td>${person.name}</td>
+                    <td>${person.m_T}</td>
+                    <td>${person.v_T}</td>
+                    <td>${person.m_D}</td>
+                    <td>${person.v_D}</td>
+                    <td>${person.m_W}</td>
+                    <td>${person.v_W}</td>
+                    <td>${person.Gty}</td>
+                </tr>`;
+                    });
+
+                    tableContent += `
+                        </tbody>
+                    </table>
+                </body>
+            </foreignObject>`;
+
+                    // Combine the initial tooltip content with the table
+                    initialTooltipContent = `<svg height='${200 + response.n_rows * 40}px' width='500px' viewBox='0 0 500 ${200 + response.n_rows * 40}'>` + initialTooltipContent;
+                    let updatedTooltipContent = initialTooltipContent + tableContent;
+
+                    // Close the SVG tag
+                    updatedTooltipContent += "</svg>";
+
+                    // Show the updated tooltip content
+                    showTooltip(evt, updatedTooltipContent);
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error fetching additional data:', status, error);
+                }
+            });
+        }
+
+    </script>
+
+</body>
+</html>
