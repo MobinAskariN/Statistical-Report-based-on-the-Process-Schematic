@@ -381,14 +381,30 @@
                             currentY += lineHeight;
                         }
 
+                        // inserting m_T, v_T, and Gty in task
                         @Html.Raw($@"<text x='{element.BOU_X}' y='{element.BOU_Y-10}' class='' fill='black'
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_T}</text>")
                         @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH}' y='{element.BOU_Y - 10}' class='' fill='black'
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_T}</text>")
                         @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH/2}' y='{element.BOU_Y + 10}' class='' fill='white'
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.Gty}</text>")
+                        // inserting proper shape for Etype
+                        if (element.EType == "PARALLEL")
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
+                                font-size='24' text-anchor='middle' dy='.3em' writing-mode='vertical-rl'>=</text>")
+                        }
+                        else if (element.EType == "SCRIPTTASK")
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + 15}' y='{element.BOU_Y + 15}' class='' fill='white'
+                                font-size='20' text-anchor='middle' dy='.3em' >S</text>")
+                        }
+                        else if (element.EType == "SUB_PROCESS")
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
+                                font-size='24' text-anchor='middle' dy='.3em' >+</text>")
+                            }
 
-                        
                     }
                 }
 

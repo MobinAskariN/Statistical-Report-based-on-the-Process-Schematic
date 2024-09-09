@@ -1,28 +1,28 @@
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('14249738065e0226ccfb2f5094740183', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('14249738065e0226ccfb2f5094740183', 10, 23, 6, 10, 4, 13, 1);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('14480339265e0239958d8e5006300073', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('14480339265e0239958d8e5006300073', 15, 20, 5, 10, 10, 10, 2);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('20480477265e0210f7e69a8070648060', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('20480477265e0210f7e69a8070648060', 14, 14, 4, 5, 10, 9, 3);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('39959047465e0226cbfea39060240072', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('39959047465e0226cbfea39060240072', 16, 16, 8, 7, 8, 9, 4);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('46050474565e03f6e710d09081361694', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('46050474565e03f6e710d09081361694', 18, 18, 1, 9, 17, 9, 5);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('48270343665e0226cb64c35020734719', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('48270343665e0226cb64c35020734719', 20, 13, 16, 12, 4, 1, 6);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('58198853765e0226cc96643007761746', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('58198853765e0226cc96643007761746', 23, 15, 12, 1, 11, 14, 7);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('60718369365e022d3e71ab8047459832', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('60718369365e022d3e71ab8047459832', 12, 6, 2, 1, 10, 5, 8);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('61982145965e022d3da6481003859404', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('61982145965e022d3da6481003859404', 12, 3, 6, 1, 6, 2, 9);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('83377105565e4c8fc145b70057545215', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('83377105565e4c8fc145b70057545215', 16, 2, 7, 1, 9, 1, 1);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('85976530966c723aec7f565033280129', 5, 2, 1, 1, 4, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('85976530966c723aec7f565033280129', 2, 6, 1, 4, 1, 2, 2);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('89213863365ea26f7f02c48055164054', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('89213863365ea26f7f02c48055164054', 5, 15, 1, 13, 4, 2, 3);
 GO
-INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('99625824165e03f6e79f755056512859', 2, 2, 1, 1, 1, 1, 1);
+INSERT INTO [report] ([UID], [m_T], [v_T], [m_D], [v_D], [m_W], [v_W], [Gty]) VALUES ('99625824165e03f6e79f755056512859', 7, 10, 1, 2, 6, 8, 4);
 GO
 INSERT INTO [vwelementposition] ([ELEMENT_UID], [ElementType], [BOU_X], [BOU_Y], [BOU_WIDTH], [BOU_HEIGHT], [EName], [EType], [BOU_ELEMENT]) VALUES (N'76501805465e0210fc2b799033535207', N'Event', 503, 26, 33, 33, NULL, N'START', N'73923313365e0210f7182d0062524665');
 GO
