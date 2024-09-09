@@ -55,8 +55,8 @@
         }
 
         .task {
-            stroke-width: 4; 
-            fill: #fccf81; 
+            stroke-width: 2; 
+            stroke: black;
             transition: fill 0.3s ease, stroke 0.3s ease;
             cursor: pointer; 
         }
@@ -129,8 +129,8 @@
 
         .table-style th, .table-style td {
             padding: 8px;
-            text-align: center; /* Center horizontally */
-            vertical-align: middle; /* Center vertically */
+            text-align: center; 
+            vertical-align: middle;
         }
 
         .table-style thead {
@@ -148,8 +148,9 @@
 
     </style>
 </head>
+
 <body >
-    <h2>Process</h2>
+    <h2>Statistical Report</h2>
     <div id="outer-area">
         <div id="inner-area">
             <svg width="@(pageInfo.p_width)" height="@(pageInfo.p_height)" id="svg" viewBox="0 0 @(pageInfo.p_width+50) @(pageInfo.p_height+50)">
@@ -159,7 +160,7 @@
                     </marker>
                 </defs>
                 
-                @{
+                @{  // drawing Laneset
                     foreach (Element element in elements)
                     {
                         if (element.ElementType == "Laneset")
@@ -178,6 +179,7 @@
                 }
 
                 @{
+                // function for setting proper format of text in every Task area
                 Func<string, int, IEnumerable<string>> WrapText = (text, maxWidth) =>
                 {
                     var words = text.Split(' ');
@@ -205,7 +207,7 @@
                 };
 
 
-                // Render lanes first
+                // drawing lanes
                 foreach (Element element in elements)
                 {
                     if (element.ElementType == "Lane")
@@ -220,6 +222,7 @@
                     }
                 }
 
+                // drawing flows
                 foreach (Flow flow in flows)
                 {
                     (int x_p, int y_p) = flow.pairs[0];
@@ -243,7 +246,7 @@
                     }
                 }
 
-                // Render events (circles) after lanes
+                // drawing events after drawing lanes and flows
                 foreach (Element element in elements)
                 {
                     if (element.ElementType == "Event")
@@ -295,6 +298,7 @@
                         }
                     else if (element.ElementType == "Task")
                     {
+                        // setting statistical reports for each Task
                         string tooltipContent = "";
                         //tooltipContent = "<svg height='300px' width='500px' viewBox='0 0 500 300'>";
                         tooltipContent += $@"
@@ -362,31 +366,45 @@
                             ";
                         //tooltipContent += "</svg>";
 
-                        Console.WriteLine(element.report.m_W);
-
                         // Calculate the text lines based on the rectangle width
                         var lines = WrapText(element.EName, element.BOU_WIDTH);
                         var lineHeight = 16; // Adjust line height if needed
                         var initialY = element.BOU_Y + element.BOU_HEIGHT / 2 - ((lines.Count() - 1) * lineHeight) / 2;
                         var currentY = initialY;
-                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}' stroke='rgb({element.rgb.Item1},{element.rgb.Item2},{element.rgb.Item3})'" +
+                        @Html.Raw($"<rect x='{element.BOU_X}' y='{element.BOU_Y}' fill='rgb({element.rgb.Item1},{element.rgb.Item2},{element.rgb.Item3})'" +
                                 $"width='{element.BOU_WIDTH}' height='{element.BOU_HEIGHT}' class='task'" +
                                  $"onclick=\"loadAdditionalData('{element.ELEMENT_UID}', event, '{HttpUtility.JavaScriptStringEncode(tooltipContent)}')\" />")
                         foreach (var line in lines)
                         {
-                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{currentY}' class='' fill='black'
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{currentY}' class='' fill='white'
                             font-size='14' text-anchor='middle' pointer-events='none' dy='.3em'>{line}</text>")
                             currentY += lineHeight;
                         }
 
+                        // inserting m_T, v_T, and Gty in task
                         @Html.Raw($@"<text x='{element.BOU_X}' y='{element.BOU_Y-10}' class='' fill='black'
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.m_T}</text>")
                         @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH}' y='{element.BOU_Y - 10}' class='' fill='black'
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_T}</text>")
-                        @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH/2}' y='{element.BOU_Y + 10}' class='' fill='black'
+                        @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH/2}' y='{element.BOU_Y + 10}' class='' fill='white'
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.Gty}</text>")
+                        // inserting proper shape for Etype
+                        if (element.EType == "PARALLEL")
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
+                                font-size='24' text-anchor='middle' dy='.3em' writing-mode='vertical-rl'>=</text>")
+                        }
+                        else if (element.EType == "SCRIPTTASK")
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + 15}' y='{element.BOU_Y + 15}' class='' fill='white'
+                                font-size='20' text-anchor='middle' dy='.3em' >S</text>")
+                        }
+                        else if (element.EType == "SUB_PROCESS")
+                        {
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
+                                font-size='24' text-anchor='middle' dy='.3em' >+</text>")
+                            }
 
-                        
                     }
                 }
 
@@ -394,6 +412,8 @@
             </svg>
         </div>
     </div>
+
+    <!-- report area -->
     <div id="report-area">
     </div>
 
@@ -412,42 +432,42 @@
         const inner_area = document.getElementById('inner-area');
         const svg = document.getElementById('svg');
         let scale = 1;
-
+        
+        // functions for zoom in and zoom out
         function zoomIn() {
             scale += 0.1;
             updateTransform();
         }
-
         function zoomOut() {
             if (@(pageInfo.p_width) * scale > 1300 || @(pageInfo.p_height) * scale > 500) {
                 scale -= 0.1;
                 updateTransform();
             }
         }
-
         function updateTransform() {
-            // Update the size of the SVG to enable more extensive scrolling
             svg.style.width = `${@(pageInfo.p_width) * scale}px`;
             svg.style.height = `${@(pageInfo.p_height) * scale}px`;
-
             inner_area.style.width = `${@(pageInfo.p_width + 10) * scale}px`;
             inner_area.style.height = `${@(pageInfo.p_height + 30) * scale}px`;
         }
+
+
+        // show report area
         function showTooltip(evt, content) {
             const tooltip = document.getElementById('report-area');
             tooltip.innerHTML = content;
             tooltip.style.visibility = "visible";
         }
-
+        // hide report area (for 'close' button)
         function hideTooltip() {
             const tooltip = document.getElementById('report-area');
             tooltip.innerHTML = "";
             tooltip.style.visibility = "hidden";
         }
-
+        // load people associated in reports by ajax
         function loadAdditionalData(uid, evt, initialTooltipContent) {
             $.ajax({
-                url: '/Process/GetAdditionalInfo',
+                url: '/Process/GetPeople',
                 type: 'GET',
                 data: { uid: uid }, // Pass the UID as a query parameter
                 success: function (response) {
@@ -490,14 +510,11 @@
                 </body>
             </foreignObject>`;
 
-                    // Combine the initial tooltip content with the table
                     initialTooltipContent = `<svg height='${200 + response.n_rows * 40}px' width='500px' viewBox='0 0 500 ${200 + response.n_rows * 40}'>` + initialTooltipContent;
                     let updatedTooltipContent = initialTooltipContent + tableContent;
 
-                    // Close the SVG tag
                     updatedTooltipContent += "</svg>";
 
-                    // Show the updated tooltip content
                     showTooltip(evt, updatedTooltipContent);
                 },
                 error: function (xhr, status, error) {

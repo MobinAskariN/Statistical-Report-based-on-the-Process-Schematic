@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace process.Models
 {
-    [Table("vwelementposition")]
+    [Table("vwelementposition")] // replace with actual table name for elements
     [Keyless]
     public class Element
     {
@@ -24,7 +24,7 @@ namespace process.Models
         public (int, int, int) rgb { get; set; }
     }
 
-    [Table("vwflowposition")]
+    [Table("vwflowposition")] // replace with actual table name for flows
     [Keyless]
     public class Flow
     {
@@ -44,7 +44,7 @@ namespace process.Models
         }
     }
 
-    [Table("report")]
+    [Table("report")] // replace with actual table name for reports
     public class Report
     {
         [Key]
@@ -93,11 +93,6 @@ namespace process.Models
             list.Add(p4);
             return list;
         }
-    }
-    class Coordinate// this is not a table
-    {
-        public int x { get; set; }
-        public int y { get; set; }
     }
 
 }
