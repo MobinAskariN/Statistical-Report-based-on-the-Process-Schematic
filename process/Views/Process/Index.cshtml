@@ -49,6 +49,24 @@
             overflow: auto;
         }
 
+        #guide-area {
+            width: 350px;
+            height: 220px;
+            position: absolute;
+            visibility: hidden;
+            display: inline-block;
+            background: white;
+            border: 1px solid black;
+            border-radius: 3px;
+            padding: 5px;
+            direction: rtl;
+            text-align: right;
+            left: 600px;
+            top: 300px;
+            overflow: auto;
+        }
+
+
         .event {
             stroke: black;
             stroke-width: 1;
@@ -403,7 +421,7 @@
                         {
                             @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
                                 font-size='24' text-anchor='middle' dy='.3em' >+</text>")
-                            }
+                        }
 
                     }
                 }
@@ -417,9 +435,30 @@
     <div id="report-area">
     </div>
 
+    <div id="guide-area">
+        <svg width="330" height="200" viewBox="0 0 330 200">
+            <rect x="60" y="40" height="100" width="200" fill="#f8b26a" stroke="black" stroke-width="2" />
+            <text x="60" y="30" text-anchor="middle" font-size="15">میانگین کل</text>
+            <text x="160" y="60" text-anchor="middle" font-size="15">تعداد</text>
+            <text x="260" y="30" text-anchor="middle" font-size="15">انحراف معیار کل</text>
+
+            <foreignObject x='130' y='160' width='80' height='30'>
+                <body xmlns='http://www.w3.org/1999/xhtml'>
+                    <button onclick='hideGuide()' style='width: 80px; height: 30px;'>Close</button>
+                </body>
+            </foreignObject>
+
+        </svg>
+    </div>
+
+
     <!-- zoom button area -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <div class="zoom-controls">
+        <button onclick="showGuide()">
+            <i class="fa fa-question-circle" style="font-size:36px"></i>
+        </button>
+
         <button onclick="zoomIn()">
             <i class="fa fa-search-plus" style="font-size:36px"></i>
         </button>
@@ -464,6 +503,17 @@
             tooltip.innerHTML = "";
             tooltip.style.visibility = "hidden";
         }
+        // show guide area
+        function showGuide() {
+            const tooltip = document.getElementById('guide-area');
+            tooltip.style.visibility = "visible";
+        }
+        // hide guide area
+        function hideGuide() {
+            const tooltip = document.getElementById('guide-area');
+            tooltip.style.visibility = "hidden";
+        }
+
         // load people associated in reports by ajax
         function loadAdditionalData(uid, evt, initialTooltipContent) {
             $.ajax({
