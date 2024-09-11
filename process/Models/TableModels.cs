@@ -106,7 +106,7 @@ namespace process.Models
         public int v_D { get; set; }
         public int m_W { get; set; }
         public int v_W { get; set; }
-        public int Gty { get; set; }
+        public int gty { get; set; }
         public Person(string name, string UID, int m_T, int v_T, int m_D, int v_D, int m_W, int v_W, int Gty)
         {
             this.name = name;
@@ -117,7 +117,7 @@ namespace process.Models
             this.v_D = v_D;
             this.m_W = m_W;
             this.v_W = v_W;
-            this.Gty = Gty;
+            this.gty = Gty;
         }
         public static List<Person> generate_fake_people()
         {

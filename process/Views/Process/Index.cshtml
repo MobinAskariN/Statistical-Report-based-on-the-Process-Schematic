@@ -536,19 +536,19 @@
                 success: function (response) {
                     // Start building the table
                     let tableContent = `
-                    <foreignObject x='20' y='160' width='500' height='${response.n_rows*40 + 40}'>
+                    <foreignObject x='20' y='160' width='500' height='${response.n_rows*40 + 120}'>
                 <body xmlns='http://www.w3.org/1999/xhtml'>
                     <table class='table-style'>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>m_T</th>
-                                <th>v_T</th>
-                                <th>m_D</th>
-                                <th>v_D</th>
-                                <th>m_W</th>
-                                <th>v_W</th>
-                                <th>Gty</th>
+                                <th>نام</th>
+                                <th>میانگین کل</th>
+                                <th>انحراف معیار کل</th>
+                                <th>میانگین انجام</th>
+                                <th>انحراف معیار انجام</th>
+                                <th>میانگین انتظار</th>
+                                <th>انحراف معیار انتظار</th>
+                                <th>تعداد</th>
                             </tr>
                         </thead>
                         <tbody>`;
@@ -563,7 +563,7 @@
                     <td>${person.v_D}</td>
                     <td>${person.m_W}</td>
                     <td>${person.v_W}</td>
-                    <td>${person.Gty}</td>
+                    <td>${person.gty}</td>
                 </tr>`;
                     });
 
@@ -573,7 +573,7 @@
                 </body>
             </foreignObject>`;
 
-                    initialTooltipContent = `<svg height='${200 + response.n_rows * 40}px' width='550px' viewBox='0 0 550 ${200 + response.n_rows * 40}'>` + initialTooltipContent;
+                    initialTooltipContent = `<svg height='${250 + response.n_rows * 40}px' width='550px' viewBox='0 0 550 ${250 + response.n_rows * 40}'>` + initialTooltipContent;
                     let updatedTooltipContent = initialTooltipContent + tableContent;
 
                     updatedTooltipContent += "</svg>";
