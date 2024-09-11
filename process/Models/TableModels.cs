@@ -33,6 +33,10 @@ namespace process.Models
         public string? FLO_NAME { get; set; }
         [NotMapped]
         public List<(int, int)> pairs = new List<(int, int)> ();
+        [NotMapped]
+        public (int, int) FLO_NAME_position { get; set; }
+
+
         public void set_pairs()
         {
             var coordinates = JsonConvert.DeserializeObject<List<Coordinate>>(FLO_STATE);
@@ -42,6 +46,41 @@ namespace process.Models
                 pairs.Add((coord.x, coord.y));
             }
         }
+        public (int, int) GetMiddlePointOfLongestLine(List<(int x, int y)> pairs)
+        {
+            double maxLength = 0;
+            (int x, int y) middlePoint = (0, 0);
+
+            // Loop through pairs of points to compute the lengths of the lines
+            for (int i = 0; i < pairs.Count - 1; i++)
+            {
+                var p1 = pairs[i];
+                var p2 = pairs[i + 1];
+
+                // Calculate the length of the current line segment
+                double length = 0;
+                if (p1.x == p2.x) // Vertical line
+                {
+                    length = Math.Abs(p2.y - p1.y);
+                }
+                else if (p1.y == p2.y) // Horizontal line
+                {
+                    length = Math.Abs(p2.x - p1.x);
+                }
+
+                // Check if this is the longest line so far
+                if (length > maxLength)
+                {
+                    maxLength = length;
+
+                    // Calculate the middle point of the longest line
+                    middlePoint = ((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+                }
+            }
+
+            return middlePoint;
+        }
+
     }
 
     [Table("report")] // replace with actual table name for reports

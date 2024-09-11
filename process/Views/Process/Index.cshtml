@@ -260,7 +260,6 @@
 
                         x_p = x;
                         y_p = y;
-
                     }
                 }
 
@@ -406,7 +405,7 @@
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.v_T}</text>")
                         @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH/2}' y='{element.BOU_Y + 10}' class='' fill='white'
                                 font-size='14' text-anchor='middle' dy='.3em'>{element.report.Gty}</text>")
-                        // inserting proper shape for Etype
+                        // inserting proper shape according to Etype
                         if (element.EType == "PARALLEL")
                         {
                             @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
@@ -425,7 +424,21 @@
 
                     }
                 }
+                foreach(Flow flow in flows)
+                {
+                    if (flow.FLO_NAME != "")
+                    {
+                        var lines = WrapText(flow.FLO_NAME, 120);
+                        var currentY = flow.FLO_NAME_position.Item2 + 5;
+                        foreach (var line in lines)
+                        {
+                            @Html.Raw($@"<text x='{flow.FLO_NAME_position.Item1}' y='{currentY}' class='' fill='black'
+                                font-size='14' text-anchor='middle' pointer-events='none' dy='.3em'>{line}</text>")
+                            currentY += 16;
+                        }
+                    }
 
+                }
                 }
             </svg>
         </div>

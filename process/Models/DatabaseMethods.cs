@@ -23,7 +23,10 @@ namespace process.Models
         {
             List<Flow> v = _context.Flow.ToList();
             foreach (Flow f in v)
+            {
                 f.set_pairs();
+                f.FLO_NAME_position = f.GetMiddlePointOfLongestLine(f.pairs);
+            }
             return v;
         }
         public Report? getReport(String UID)
