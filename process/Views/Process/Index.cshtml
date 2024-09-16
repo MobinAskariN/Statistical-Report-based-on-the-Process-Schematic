@@ -408,18 +408,27 @@
                         // inserting proper shape according to Etype
                         if (element.EType == "PARALLEL")
                         {
-                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2 + 3}' y='{element.BOU_Y + element.BOU_HEIGHT - 20}' class='' fill='white'
                                 font-size='24' text-anchor='middle' dy='.3em' writing-mode='vertical-rl'>=</text>")
+                            @Html.Raw($"<circle cx='{element.BOU_X + element.BOU_WIDTH / 2}' cy='{element.BOU_Y + element.BOU_HEIGHT - 13}'" +
+                                     $" r='10' fill='none' stroke='white' stroke-width='1' />")
+
                         }
                         else if (element.EType == "SCRIPTTASK")
                         {
                             @Html.Raw($@"<text x='{element.BOU_X + 15}' y='{element.BOU_Y + 15}' class='' fill='white'
                                 font-size='20' text-anchor='middle' dy='.3em' >S</text>")
+                            @Html.Raw($"<circle cx='{element.BOU_X + 15}' cy='{element.BOU_Y + 15}'" +
+                                    $" r='10' fill='none' stroke='white' stroke-width='1' />")
+
                         }
                         else if (element.EType == "SUB_PROCESS")
                         {
-                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 15}' class='' fill='white'
+                            @Html.Raw($@"<text x='{element.BOU_X + element.BOU_WIDTH / 2}' y='{element.BOU_Y + element.BOU_HEIGHT - 13}' class='' fill='white'
                                 font-size='24' text-anchor='middle' dy='.3em' >+</text>")
+                            @Html.Raw($"<circle cx='{element.BOU_X + element.BOU_WIDTH / 2}' cy='{element.BOU_Y + element.BOU_HEIGHT - 13}'" +
+                                    $" r='10' fill='none' stroke='white' stroke-width='1' />")
+
                         }
 
                     }
